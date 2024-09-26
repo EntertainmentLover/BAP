@@ -63,7 +63,7 @@
 #         return s
 #     return bank(s*(1+p/100), p, t-1)
 
-# s = int(input("Введите начальную сумму: "))
+# s = int(input("Введите сумму: "))
 # p = float(input("Введите проценты: "))
 # t = int(input("Введите время: "))
 # print(bank(s, p, t))
