@@ -38,11 +38,14 @@
 
 
 
-
-
-
-
-
+# def lin_lab(n, raz):
+#     s = n+1
+#     for r in raz:
+#         s += 2*(r - 1)
+#     return s
+# n = 5
+# raz = [2, 4]
+# print(lin_lab(n, raz))
 
 
 
