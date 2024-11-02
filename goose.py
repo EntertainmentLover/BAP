@@ -16,13 +16,13 @@ class Pawn(ChessPiece):
         start_row, start_col = start
         end_row, end_col = end
 
-        if end_col == start_col:  # обычный ход
+        if end_col == start_col:
             if board[end_row][end_col] == '.':
                 if (end_row - start_row) == direction:
                     return True
                 if (end_row - start_row) == 2 * direction and start_row in [1, 6]:
                     return board[start_row + direction][start_col] == '.'
-        elif abs(end_col - start_col) == 1 and (end_row - start_row) == direction:  # захват
+        elif abs(end_col - start_col) == 1 and (end_row - start_row) == direction:
             if board[end_row][end_col] != '.':
                 return True
         return False
@@ -35,13 +35,13 @@ class Rook(ChessPiece):
     def validate_line_move(self, start, end, board):
         start_row, start_col = start
         end_row, end_col = end
-        if start_row == end_row:  # горизонтальный ход
+        if start_row == end_row:
             step = 1 if end_col > start_col else -1
             for col in range(start_col + step, end_col, step):
                 if board[start_row][col] != '.':
                     return False
             return True
-        elif start_col == end_col:  # вертикальный ход
+        elif start_col == end_col:
             step = 1 if end_row > start_row else -1
             for row in range(start_row + step, end_row, step):
                 if board[row][start_col] != '.':
@@ -111,19 +111,14 @@ class Goose(ChessPiece):
         return False
 
     def move(self, start, end, board):
-        # Убираем проверку на допустимость хода
-        board[start[0]][start[1]] = '.'  # Удаляем гусей с начальной позиции
-        board[end[0]][end[1]] = self  # Устанавливаем гуся на новую позицию
-
-        # Проверяем, есть ли фигура на конечной позиции
+        board[start[0]][start[1]] = '.'
+        board[end[0]][end[1]] = self  
         target_piece = board[end[0]][end[1]]
         if isinstance(target_piece, ChessPiece) and target_piece.color != self.color:
-            # Бросаем кубик, если есть фигура для съедения
             dice_roll = random.randint(1, 6)
             print(f"Гусь бросил кубик: {dice_roll}")
-
-            if dice_roll % 2 == 0:  # Четное число
-                self.eat_piece(end, board)  # Передаем конечную позицию для съедения
+            if dice_roll % 2 == 0:
+                self.eat_piece(end, board)
         else:
             print("На конечной позиции нет фигуры для съедения!")
 
@@ -174,9 +169,9 @@ class ChessBoard:
                 piece.move(start, end, self.board)
                 self.move_history.append(f"{piece} from {start} to {end}")
                 self.undo_stack.append((start, end, piece))
-                self.current_turn = 'black' if self.current_turn == 'white' else 'white'  # Меняем текущий ход
+                self.current_turn = 'black' if self.current_turn == 'white' else 'white'
             else:
-                if piece.is_valid_move(start, end, self.board):  # Проверка допустимости хода
+                if piece.is_valid_move(start, end, self.board):
                     self.undo_stack.append((start, end, piece))
                     self.move_history.append(f"{piece} from {start} to {end}")
                     self.board[end[0]][end[1]] = piece
@@ -186,7 +181,7 @@ class ChessBoard:
                             self.white_king_pos = end
                         else:
                             self.black_king_pos = end
-                    self.current_turn = 'black' if self.current_turn == 'white' else 'white'  # Меняем текущий ход
+                    self.current_turn = 'black' if self.current_turn == 'white' else 'white'
                 else:
                     print("Неверный ход!")
         else:
@@ -211,7 +206,7 @@ class ChessBoard:
         if self.undo_stack:
             start, end, piece = self.undo_stack.pop()
             self.board[start[0]][start[1]] = piece
-            self.board[end[0]][end[1]] = '.'  # Удаляем фигуру с конечной позиции
+            self.board[end[0]][end[1]] = '.'  
             self.current_turn = 'black' if self.current_turn == 'white' else 'white'
             print(f"Ход отменен: {piece.__class__.__name__} с {end} на {start}")
         else:
