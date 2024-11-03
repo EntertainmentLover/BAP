@@ -15,7 +15,6 @@ class Pawn(ChessPiece):
         direction = -1 if self.color == 'white' else 1
         start_row, start_col = start
         end_row, end_col = end
-
         if end_col == start_col:
             if board[end_row][end_col] == '.':
                 if (end_row - start_row) == direction:
@@ -92,35 +91,38 @@ class King(ChessPiece):
 class Goose(ChessPiece):
     def __init__(self, color):
         super().__init__(color)
-
     def __str__(self):
         return 'G' if self.color == 'white' else 'g'
-
     def is_valid_move(self, start, end, board):
         start_row, start_col = start
         end_row, end_col = end
         row_diff = abs(start_row - end_row)
         col_diff = abs(start_col - end_col)
-        
         if (row_diff == 2 and col_diff == 1) or (row_diff == 1 and col_diff == 2):
             mid_row = (start_row + end_row) // 2
-            mid_col = (start_col + end_col) // 2  
-            if board[mid_row][mid_col] != '.':
-                return False        
+            mid_col = (start_col + end_col) // 2
+            if board[mid_row][mid_col] != '.' and board[mid_row][mid_col].color == self.color:
+                return False
             return True
         return False
-
     def move(self, start, end, board):
-        board[start[0]][start[1]] = '.'
-        board[end[0]][end[1]] = self  
-        target_piece = board[end[0]][end[1]]
-        if isinstance(target_piece, ChessPiece) and target_piece.color != self.color:
-            dice_roll = random.randint(1, 6)
-            print(f"Гусь бросил кубик: {dice_roll}")
-            if dice_roll % 2 == 0:
-                self.eat_piece(end, board)
-        else:
-            print("На конечной позиции нет фигуры для съедения!")
+        start_row, start_col = start
+        board[start_row][start_col] = '.'
+        board[end[0]][end[1]] = self
+        if abs(start_row - end[0]) == 2 or abs(start_col - end[1]) == 2:
+            mid_row = (start_row + end[0]) // 2
+            mid_col = (start_col + end[1]) // 2
+            middle_square = board[mid_row][mid_col]
+            if middle_square != '.' and middle_square.color != self.color:
+                random_number = random.randint(1, 6)
+                print(f"Гусь бросил кубик: {random_number}")
+                if random_number % 2 == 0:
+                    self.eat_piece(middle_square, board)
+        self.x, self.y = end
+        return True
+    def eat_piece(self, piece, board):
+        board[piece.x][piece.y] = '.'
+        print(f"{self} съел {piece}!")
 
 class ChessBoard:
     def __init__(self):
@@ -128,7 +130,6 @@ class ChessBoard:
         self.current_turn = 'white'
         self.move_history = []
         self.undo_stack = []
-
     def create_board(self):
         board = [['.' for _ in range(8)] for _ in range(8)]
         board[0] = [Rook('black'), 
@@ -150,7 +151,6 @@ class ChessBoard:
                     Knight('white'), 
                     Rook('white')]
         return board
-
     def display_board(self):
         print("   a b c d e f g h")
         print(" +-----------------+")
@@ -160,7 +160,6 @@ class ChessBoard:
                 print(str(cell), end=' ')
             print("|")
         print(" +-----------------+\n")
-
     def move_piece(self, start, end):
         start_row, start_col = start
         piece = self.board[start_row][start_col]
@@ -186,7 +185,6 @@ class ChessBoard:
                     print("Неверный ход!")
         else:
             print("Нет фигуры в стартовой позиции или неверный игрок.")
-
     def is_valid_move(self, piece, start, end):
         if piece == '.':
             print("Нет фигуры в стартовой позиции.")
@@ -201,7 +199,6 @@ class ChessBoard:
             print("Ход приводит к шаху королю!")
             return False
         return True
-    
     def undo_move(self):
         if self.undo_stack:
             start, end, piece = self.undo_stack.pop()
@@ -211,7 +208,6 @@ class ChessBoard:
             print(f"Ход отменен: {piece.__class__.__name__} с {end} на {start}")
         else:
             print("Нет ходов для отмены.")
-
     def is_king_in_check(self, king_pos, king_color):
         enemy_color = 'black' if king_color == 'white' else 'white'
         for row in range(8):
@@ -221,7 +217,6 @@ class ChessBoard:
                     if piece.is_valid_move((row, col), king_pos, self.board):
                         return True
         return False
-
     def is_game_over(self):
         if self.is_king_in_check(self.get_king_position('white'), 'white'):
             if not self.has_legal_moves('white'):
@@ -234,7 +229,6 @@ class ChessBoard:
         if not self.has_legal_moves('white') and not self.has_legal_moves('black'):
             return "draw"
         return "ongoing"
-
     def get_king_position(self, color):
         for row in range(8):
             for col in range(8):
@@ -242,7 +236,6 @@ class ChessBoard:
                 if isinstance(piece, King) and piece.color == color:
                     return (row, col)
         return None
-
     def has_legal_moves(self, color):
         for row in range(8):
             for col in range(8):
@@ -253,7 +246,7 @@ class ChessBoard:
                             if piece.is_valid_move((row, col), (target_row, target_col), self.board):
                                 return True
         return False
-
+        
 def parse_position(pos):
     if len(pos) != 2 or pos[0] not in "abcdefgh" or pos[1] not in "12345678":
         raise ValueError("Неверный формат позиции. Используйте 'a1' - 'h8'.")
@@ -262,7 +255,6 @@ def parse_position(pos):
 def main():
     game = ChessBoard()
     game.display_board()
-
     while True:
         print(f"Ход: {game.current_turn}")
         action = input("Введите 'move' для хода, 'undo' для отмены, 'exit' для выхода: ").strip().lower()
