@@ -123,3 +123,50 @@
 
 # main()
 
+#задача мистера Руслана
+# from heapq import heappush, heappop
+# n, m = int(input("Кол-во городов: ")), int(input("Кол-во дорог: "))
+# G=[[] for _ in range(n+1)]
+# for _ in range(m):
+#     a,b,w=map(int,input("Соединненые города и максимальный вес: ").split()); G[a].append((b,w)); G[b].append((a,w))
+# s,t=map(int,input().split())
+# d=[0]*(n+1); d[s]=10**9+1
+# h=[(-d[s],s)]
+# while h:
+#     c,u=heappop(h); c=-c
+#     if u==t: print(c); exit()
+#     if c!=d[u]: continue
+#     for v,w in G[u]:
+#         nc=min(c,w)
+#         if nc>d[v]:
+#             d[v]=nc; heappush(h,(-nc,v))
+# print(0)
+
+
+def main():
+    n = int(input())
+    if n&1:
+        print(-1); return
+    g = [[] for _ in range(n+1)]
+    for _ in range(n-1):
+        u,v = map(int, input().split())
+        g[u].append(v); g[v].append(u)
+        s = [0]*(n+1); ans = 0; st = [(1, 0, 0)]
+        while st:
+            u, p, f = st.pop()
+            if f:
+                s[u] = 1
+                for v in g[u]:
+                    if v==p: continue
+                    s[u] += s[v]
+                if p and s[u]&1 == 0: ans += 1
+            else:
+                st.append((u, p, 1))
+                for v in g[u]:
+                    if v==p: continue
+                    st.append((v, u, 0))
+        print(ans)
+
+if __name__== "__main__":
+    main()
+    
