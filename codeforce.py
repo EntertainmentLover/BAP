@@ -143,45 +143,78 @@
 # print(0)
 
 
-# def main():
-#     n = int(input())
-#     if n&1:
-#         print(-1); return
-#     g = [[] for _ in range(n+1)]
-#     for _ in range(n-1):
-#         u,v = map(int, input().split())
-#         g[u].append(v); g[v].append(u)
-#         s = [0]*(n+1); ans = 0; st = [(1, 0, 0)]
-#         while st:
-#             u, p, f = st.pop()
-#             if f:
-#                 s[u] = 1
-#                 for v in g[u]:
-#                     if v==p: continue
-#                     s[u] += s[v]
-#                 if p and s[u]&1 == 0: ans += 1
+#1526b
+# def s():
+#     t = int(input())
+#     for _ in range(t):
+#         x = int(input())
+#         pos = False
+#         for c in range(0,100):
+#             if x >= c * 111 and (x - c * 111) % 11 == 0:
+#                 pos = True
+#                 break
+#         print("YES" if pos else "NO") 
+
+# if __name__ == "__main__":
+#     s()  
+
+
+#1321c
+# def max_d(n, s):
+#     s = list(s)
+#     count = 0
+#     found = True
+#     while found:
+#         found = False
+#         i = 0
+#         while i < len(s):
+#             if (i > 0 and ord(s[i]) == ord(s[i-1]) + 1) or (i < len(s) - 1 and ord(s[i]) == ord(s[i+1]) + 1):
+#                 del s[i]
+#                 count += 1
+#                 found = True
 #             else:
-#                 st.append((u, p, 1))
-#                 for v in g[u]:
-#                     if v==p: continue
-#                     st.append((v, u, 0))
-#         print(ans)
+#                 i += 1
+#     return count
 
-# if __name__== "__main__":
-#     main()
+# n = int(input())
+# s = input().strip()
+# print(max_d(n, s))
+
+
+# 982с
+def main():
+    n = int(input())
+    if n % 2:
+        print(-1)
+        return
+    g = [[] for _ in range(n+1)]
+    for _ in range(n-1):
+        u, v = map(int, input().split())
+        g[u].append(v)
+        g[v].append(u)
+    parent = [0]*(n+1)
+    order = []
+    stack = [1]
+    while stack:
+        v = stack.pop()
+        order.append(v)
+        for w in g[v]:
+            if w == parent[v]:
+                continue
+            parent[w] = v
+            stack.append(w)
+    ans = 0
+    sub = [0]*(n+1)
+    for v in order[::-1]:
+        sub[v] = 1
+        for w in g[v]:
+            if w == parent[v]:
+                continue
+            sub[v] += sub[w]
+        if v != 1 and sub[v] % 2 == 0:
+            ans += 1
+    print(ans)
+
+main()
+
     
-
-
-def s():
-    t = int(input())
-    for _ in range(t):
-        x = int(input())
-        pos = False
-        for c in range(0,100):
-            if x >= c * 111 and (x - c * 111) % 11 == 0:
-                pos = True
-                break
-        print("YES" if pos else "NO") 
-
-if __name__ == "__main__":
-    s()  
